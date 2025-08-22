@@ -19,5 +19,3 @@ app.listen(PORT, () => {
 });
 
 
-// mhmadmig2001
-// 5ghl8bK0ayslaMKd

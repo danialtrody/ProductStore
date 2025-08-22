@@ -1,0 +1,139 @@
+import { Box,Heading,HStack,IconButton,Image,Text,useColorModeValue ,useToast ,Modal,useDisclosure, ModalCloseButton, ModalBody, VStack, Input,ModalOverlay,
+    ModalContent,ModalHeader, Button,    
+    ModalFooter} from '@chakra-ui/react';
+import {DeleteIcon , EditIcon} from "@chakra-ui/icons"
+import React, { use } from 'react'
+import { useProductStore } from '../store/product';
+import { useState } from 'react';
+
+
+const ProductCard = ({product}) => {
+    const [updtProduct, setUpdtProduct] = useState(product);
+
+    const textColor = useColorModeValue("gray.600", "gray.200");
+    const bg = useColorModeValue("white", "gray.800");
+
+    const {deleteProduct} = useProductStore();
+    const toast = useToast();
+    const {isOpen, onOpen, onClose} = useDisclosure();
+
+
+    const handleDeleteProduct = async(pid) => {
+        const {success, message} = await deleteProduct(product._id);
+        if (!success){  
+            toast({
+                title: "Error",
+                description: message,
+                status: "error",
+                isClosable: true,
+            });
+            }
+        else {
+            toast({
+                title: "Success",
+                description: message,
+                status: "success",
+                isClosable: true,
+            });
+        } 
+    }
+
+    const {updateProduct} = useProductStore();
+    const handleUpdatedProduct = async(pid, updtProduct) => {
+        const {success,message} = await updateProduct(pid, updtProduct);
+        onClose();
+        if (!success){
+            toast({
+                title: "Error",
+                description: "Failed to update product",
+                status: "error",
+                isClosable: true,
+            });
+        }
+        else {
+            toast({
+                title: "Success",
+                description: "Product updated successfully",
+                status: "success",
+                isClosable: true,
+            });
+        }   
+    }
+
+
+    return (
+    <Box
+        shadow={'lg'}
+        rounded={'lg'}
+        overflow={'hidden'}
+        transition={"all 0.3s"}
+        _hover={{transform: "translateY(-5px)", shadow: "xl"}}
+        bg={bg}
+        w={"full"}
+    >
+        <Image src={product.image} alt={product.name} h={48} w={"full"} objectFit="contain" bg={'white'} />
+
+        <Box p={4}>
+            <Heading as={"h3"} size={"md"} mb={2} >
+                {product.name}
+            </Heading>
+
+            <Text fontWeight={"bold"} fontSize={"xl"} color={textColor} mb={4}>
+                ${product.price}
+            </Text>
+
+            <HStack spacing={2}>
+                <IconButton icon={<EditIcon />} onClick={onOpen} colorScheme='blue'></IconButton>
+                <IconButton icon={<DeleteIcon />} onClick={() => handleDeleteProduct(product._id)} colorScheme='red'></IconButton>
+            </HStack>
+
+        </Box>   
+
+        <Modal isOpen={isOpen} onClose={onClose} >
+            <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>Update Product</ModalHeader>
+                    <ModalCloseButton />
+
+                    <ModalBody>
+                        <VStack spacing={4} >
+                            <Input 
+                            placeholder='Product Name'
+                            name='name'
+                            value={updtProduct.name}
+                            onChange={(e) => setUpdtProduct({...updtProduct, name: e.target.value})}
+                             />
+                            <Input 
+                            placeholder='Product Price'
+                            name='price'
+                            type='number'
+                            value={updtProduct.price}
+                            onChange={(e) => setUpdtProduct({...updtProduct, price: e.target.value})}
+                            />
+                            <Input
+                            placeholder='Product Image URL'
+                            name='image'
+                            value={updtProduct.image}
+                            onChange={(e) => setUpdtProduct({...updtProduct, image: e.target.value})}
+                            />
+                        </VStack>
+                    </ModalBody>
+
+                    <ModalFooter>
+                        <Button colorScheme='blue' mr={3} 
+                        onClick={() => handleUpdatedProduct(product._id, updtProduct) }>
+                            Update
+                        </Button>
+                        <Button variant='ghost' onClick={onClose}>Cancel</Button>
+                    </ModalFooter>
+
+                </ModalContent>   
+
+        </Modal>
+
+    </Box>
+
+  );
+};
+
+export default ProductCard
