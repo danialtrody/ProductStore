@@ -19,7 +19,7 @@ const ProductCard = ({product}) => {
 
 
     const handleDeleteProduct = async(pid) => {
-        const {success, message} = await deleteProduct(product._id);
+        const {success, message} = await deleteProduct(pid);
         if (!success){  
             toast({
                 title: "Error",
@@ -40,7 +40,7 @@ const ProductCard = ({product}) => {
 
     const {updateProduct} = useProductStore();
     const handleUpdatedProduct = async(pid, updtProduct) => {
-        const {success,message} = await updateProduct(pid, updtProduct);
+        const {success} = await updateProduct(pid, updtProduct);
         onClose();
         if (!success){
             toast({
